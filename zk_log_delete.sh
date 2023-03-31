@@ -1,6 +1,7 @@
 #!/bin/bash
 
-DATA_PATH=$(gadmin config get System.DataRoot)
+# DATA_PATH=$(gadmin config get System.DataRoot)
+DATA_PATH=/home/tigergraph/tigergraph/data
 ZK_PATH=${DATA_PATH}/zk/version-2 #// ZK_PATH=/home/tigergraph/zk_logs
 n_files_left=3
 
@@ -12,16 +13,16 @@ if [[ $limit_files -gt 0 ]]; then
     ls -ltrh ${ZK_PATH} | grep log | head -${limit_files}
 
     #? Show the amount of storage that will reduce, and the percentage too
-    size=`ls -lrts ${ZK_PATH}/log* | head -${limit_files} | awk '{ print; total += $1 }; END { print total }' | tail -n 1`
+    size=`ls -lrts ${ZK_PATH}/log* | head -${limit_files} | awk '{ print; total += $6 }; END { print total }' | tail -n 1`
 
-    sizeGB=$(echo "scale=1; $size / (1024 * 1024)" | bc)
+    sizeGB=$(echo "scale=1; $size / (1024 * 1024 * 1024)" | bc)
     percentage=$(echo "scale=2; $sizeGB / 199.99 * 100.0" | bc) #? 200 GB = 209715200; df = 209702892 => 199.99
 
-    echo -e "\nThe size is: ${sizeGB} GB, it will free the storage about ${percentage} %"
+    echo -e "\nTotal size is: \033[1;34m${sizeGB} GB\033[0m, it will free the storage about \033[1;32m${percentage} %\033[0m"
 
     echo -e "\nThis is 3 latest files that will be keep:"
     ls -ltrh ${ZK_PATH} | grep log | tail -n 3
-    echo ""
+        echo ""
 
     while true; do
         echo -ne "\033[0;33mAre you sure to delete these files? (y/n)\033[0m"; read yn
